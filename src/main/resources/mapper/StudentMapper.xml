@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyh.dao.IStudentDao" >
+    <resultMap id="BaseResultMap" type="com.hyh.model.User" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="img" property="img" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="pwd" property="pwd" jdbcType="VARCHAR" />
+        <result column="age" property="age" jdbcType="INTEGER" />
+        <result column="sex" property="sex" jdbcType="VARCHAR" />
+        <association property="clazz" javaType="com.hyh.model.Clazz">
+            <id column="clazzid" property="id"></id>
+            <result column="clazzname" property="name"></result>
+            <result column="number" property="number"></result>
+        </association>
+    </resultMap>
+
+    <!--  -->
+    <select id="selectAll" resultMap="BaseResultMap">
+      select
+      a.id,
+      a.img,
+      a.name as name,
+      a.pwd,
+      a.age,
+      a.sex,
+      b.id as clazzid,
+      b.name as clazzname,
+      b.number
+      from
+      user a
+      inner join
+      clazz b
+      on a.clazz = b.id
+    </select>
+
+    <select id="selectStudentByNameAndPwd" resultMap="BaseResultMap">
+        select * from user where name=#{name} and pwd=#{pwd}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+      select
+      a.id,
+      a.img,
+      a.name as name,
+      a.pwd,
+      a.age,
+      a.sex,
+      b.id as clazzid,
+      b.name as clazzname,
+      b.number
+      from
+      user a
+      inner join
+      clazz b
+      on a.clazz = b.id
+      where a.id=#{uid}
+    </select>
+
+    <delete id="deleteStudent">
+        delete from user where id=#{uid}
+    </delete>
+
+    <update id="updateStudent">
+        update user set
+        img=#{img}, name=#{name}, pwd=#{pwd}, age=#{age}, sex=#{sex}, clazz=#{clazz.id}
+        where id=#{id}
+    </update>
+
+</mapper>

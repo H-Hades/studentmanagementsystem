@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+  <display-name>Archetype Created Web Application</display-name>
+
+  <!--welcome pages-->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <!--DispatcherServlet专门截获请求，把请求分发到不同的Controller控制器上
+      但是如果请求的是静态资源文件或者是jsp文件，如何处理这种情况
+      DispatcherServlet默认在web.xml统计目录下加载
+      servlet-name-servlet.xml这个spring配置文件
+      spring-servlet.xml
+      -->
+  <servlet>
+  <servlet-name>spring</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:myspring.xml</param-value>
+  </init-param>
+  </servlet>
+  <servlet-mapping>
+  <servlet-name>spring</servlet-name>
+  <!--servlet有四种匹配方式    Tomcat xml  default
+  精确匹配  路径匹配  扩展名匹配  缺省匹配
+
+  DefaultServlet => /
+  JspServlet => *.jsp *jspx
+  -->
+  <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  <!-- 配置编码方式过滤器,注意一点:要配置在所有过滤器的前面 -->
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <!--让Spring接管session会话的管理-->
+  <filter>
+    <filter-name>springSessionRepositoryFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>springSessionRepositoryFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+
+
+</web-app>

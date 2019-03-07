@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+    <!--设置Spring框架自动扫描bean的基础包路径-->
+    <context:component-scan base-package="com.hyh"></context:component-scan>
+
+    <!--
+    JavaConfig类来启动Spring Context
+    @EnableAspectJAutoProxy // 启动aspectj自动代理，实现aop功能
+    @EnableTransactionManagement  // 启动基于注解实现的事务处理功能
+    @EnableWebMVC
+    -->
+    <!--开启注解实现的Spring MVC功能-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <!--配置Spring MVC放行静态资源文件-->
+    <mvc:resources mapping="/assets/**" location="/assets/"></mvc:resources>
+    <!--配置datasource-->
+    <bean id="datasource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/java1801?useSSL=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="jasmine"></property>
+    </bean>
+    <!--配置Spring平台的MyBatis实现，主要配置dataSoucce和basePackage-->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="datasource"></property>
+        <property name="mapperLocations" value="classpath:/mapper/*.xml"></property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.hyh.dao"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"></property>
+    </bean>
+
+    <!--配置事务管理器-->
+    <bean id = "transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="datasource"></property>
+    </bean>
+    <!--开启基于注解的事务处理-->
+    <tx:annotation-driven  transaction-manager="transactionManager"></tx:annotation-driven>
+
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+    <!--配置文件上传操作的bean类-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="20000000"/>
+    </bean>
+    <!--配置Spring MVC拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.hyh.interceptor.UserAuthInterceptor">
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!--设置redis中缓存session的失效时间-->
+    <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+        <property name="maxInactiveIntervalInSeconds" value="3600"></property>
+    </bean>
+
+    <!--配置Jedis的连接工厂-->
+    <bean class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="127.0.0.1"></property>
+        <property name="port" value="6379"></property>
+    </bean>
+
+</beans>
